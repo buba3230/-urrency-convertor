@@ -1,0 +1,33 @@
+<ng-container *ngIf="currency$ | async as currency">
+    <app-header [rate] = currency></app-header>
+    <form [formGroup]="currencyForm" class="exchange-form">
+        <div class="form-control">
+            <div class="amount"> 
+                <label for="from">Currency</label>
+                <input type="text" id="from" [formControl]="fromIControl" class="input-custom">
+            </div>
+            <div class="currency-select">
+                <label for="fromCurrency">Select currency</label>
+                <select [formControl]="fromCurrencyControl" name="fromCurrency" class="input-custom">
+                    <option *ngFor="let item of currency" [value]="item.cc" >
+                        {{item.cc}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="form-control">
+            <div class="amount"> 
+                <label for="to">Currency</label>
+                <input type="text" id="to" [formControl]="toControl" class="input-custom">
+            </div>
+            <div class="currency-select">
+                <label for="toCurrency">Select currency</label>
+                <select [formControl]="toCurrencyControl" name="toCurrency" class="input-custom">
+                    <option *ngFor="let item of currency" [value]="item.cc" >
+                        {{item.cc}}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </form>
+</ng-container>
