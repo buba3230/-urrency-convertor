@@ -4,12 +4,16 @@
         <div class="form-control">
             <div class="amount"> 
                 <label for="from">Currency</label>
-                <input type="text" id="from" [formControl]="fromIControl" class="input-custom">
+                <input type="text" id="from" [formControl]="fromIControl" class="input-custom"
+                (focus)="fromFieldSubscribe()"
+                (blur)="fromFieldUnsubscribe()">
             </div>
             <div class="currency-select">
                 <label for="fromCurrency">Select currency</label>
-                <select [formControl]="fromCurrencyControl" name="fromCurrency" class="input-custom">
-                    <option *ngFor="let item of currency" [value]="item.cc" >
+                <select [formControl]="fromCurrencyControl" name="fromCurrency" class="input-custom"
+                (focus)="fromCCFieldSubscribe()"
+                (blur)="fromCCFieldUnsubscribe()">
+                    <option *ngFor="let item of currency" [value]="item.cc">
                         {{item.cc}}
                     </option>
                 </select>
@@ -18,11 +22,15 @@
         <div class="form-control">
             <div class="amount"> 
                 <label for="to">Currency</label>
-                <input type="text" id="to" [formControl]="toControl" class="input-custom">
+                <input type="text" id="to" [formControl]="toControl" class="input-custom"
+                (focus)="toFieldSubscribe()"
+                (blur)="toFieldUnsubscribe()">
             </div>
             <div class="currency-select">
                 <label for="toCurrency">Select currency</label>
-                <select [formControl]="toCurrencyControl" name="toCurrency" class="input-custom">
+                <select [formControl]="toCurrencyControl" name="toCurrency" class="input-custom"
+                (focus)="toCCFieldSubscribe()"
+                (blur)="toCCFieldUnsubscribe()">
                     <option *ngFor="let item of currency" [value]="item.cc" >
                         {{item.cc}}
                     </option>

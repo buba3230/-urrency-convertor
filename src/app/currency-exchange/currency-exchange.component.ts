@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Observable, combineLatest, map, take, withLatestFrom } from 'rxjs';
+import { Observable, Subscription, map, withLatestFrom } from 'rxjs';
 import { ICurrency } from '../currency-data-access/currency.models';
 import {
   selectCurrencySelector,
@@ -53,65 +53,120 @@ export class CurrencyExchangeComponent {
     toCurrency: this.toCurrencyControl,
   });
 
+  fromSubscription: Subscription;
+  fromCCSubscription: Subscription;
+  toSubscription: Subscription;
+  toCCSubscription: Subscription;
+
   ngOnInit(): void {
     this.store.dispatch(getCurrencyRate());
-    // this.fromIControl.valueChanges
-    //   .pipe(withLatestFrom(this.currency$))
-    //   .subscribe(([value, rate]) => {
-    //     if (
-    //       value &&
-    //       rate &&
-    //       this.fromCurrencyControl.value &&
-    //       this.toCurrencyControl.value
-    //     ) {
-    //       const toCc = this.toCurrencyControl.value;
-    //       const fromCc = this.fromCurrencyControl.value;
-          // const UAH =
-          //   value * (rate.find((item) => item.cc === fromCc)?.rate ?? 0);
-          // const result =
-          //   UAH / (rate.find((item) => item.cc === toCc)?.rate ?? 0);
-          // this.toControl.patchValue(result);
-    //     }
-    //   });
+  }
 
-      // this.toControl.valueChanges
-      // .pipe(withLatestFrom(this.currency$))
-      // .subscribe(([value, rate]) => {
-      //   if (
-      //     value &&
-      //     rate &&
-      //     this.toCurrencyControl.value &&
-      //     this.fromCurrencyControl.value
-      //   ) {
-      //     const toCc = this.fromCurrencyControl.value;
-      //     const fromCc = this.toCurrencyControl.value;
-      //     const UAH =
-      //       value * (rate.find((item) => item.cc === fromCc)?.rate ?? 0);
-      //     const result =
-      //       UAH / (rate.find((item) => item.cc === toCc)?.rate ?? 0);
-      //     this.fromIControl.patchValue(result);
-      //   }
-      // });
-
-      combineLatest([
-        this.fromIControl.valueChanges,
-        this.fromCurrencyControl.valueChanges,
-        this.toControl.valueChanges,
-        this.toCurrencyControl.valueChanges
-      ]).pipe(
-        take(1), withLatestFrom(this.currency$)
-      ).subscribe(([[from, fromCc, to, toCc], rate]) => {
-        if (from && fromCc && to && toCc && rate) {
-          console.log(from);
-          console.log(fromCc);
-          console.log(to);
-          console.log(toCc);
+  fromFieldSubscribe(): void {
+    this.fromSubscription = this.fromIControl.valueChanges
+      .pipe(withLatestFrom(this.currency$))
+      .subscribe(([value, rate]) => {
+        if (
+          value &&
+          rate &&
+          this.fromCurrencyControl.value &&
+          this.toCurrencyControl.value
+        ) {
+          const toCc = this.toCurrencyControl.value;
+          const fromCc = this.fromCurrencyControl.value;
           const UAH =
-           from * (rate.find((item) => item.cc === fromCc)?.rate ?? 0);
-           const result =
+            value * (rate.find((item) => item.cc === fromCc)?.rate ?? 0);
+          const result =
             UAH / (rate.find((item) => item.cc === toCc)?.rate ?? 0);
           this.toControl.patchValue(result);
         }
-      })
+      });
+  }
+
+  fromFieldUnsubscribe(): void {
+    if (this.fromSubscription) {
+      this.fromSubscription.unsubscribe();
+    }
+  }
+
+  fromCCFieldSubscribe(): void {
+    this.fromCCFieldUnsubscribe();
+    this.fromCCSubscription = this.fromCurrencyControl.valueChanges
+      .pipe(withLatestFrom(this.currency$))
+      .subscribe(([value, rate]) => {
+        if (
+          value &&
+          rate &&
+          this.fromIControl.value &&
+          this.toCurrencyControl.value
+        ) {
+          const fromValue = this.fromIControl.value;
+          const toCc = this.toCurrencyControl.value;
+          const UAH = fromValue * (rate.find((item) => item.cc === value)?.rate ?? 0);
+          const result =
+            UAH / (rate.find((item) => item.cc === toCc)?.rate ?? 0);
+          this.toControl.patchValue(result);
+        }
+      });
+  }
+
+  fromCCFieldUnsubscribe(): void {
+    if (this.fromCCSubscription) {
+      this.fromCCSubscription.unsubscribe();
+    }
+  }
+
+  toFieldSubscribe(): void {
+    this.toSubscription = this.toControl.valueChanges
+      .pipe(withLatestFrom(this.currency$))
+      .subscribe(([value, rate]) => {
+        if (
+          value &&
+          rate &&
+          this.toCurrencyControl.value &&
+          this.fromCurrencyControl.value
+        ) {
+          const toCc = this.toCurrencyControl.value;
+          const fromCc = this.fromCurrencyControl.value;
+          const UAH =
+            value * (rate.find((item) => item.cc === toCc)?.rate ?? 0);
+          const result =
+            UAH / (rate.find((item) => item.cc === fromCc)?.rate ?? 0);
+          this.fromIControl.patchValue(result);
+        }
+      });
+  }
+
+  toFieldUnsubscribe(): void {
+    if (this.toSubscription) {
+      this.toSubscription.unsubscribe();
+    }
+  }
+
+  toCCFieldSubscribe(): void {
+    this.toCCFieldUnsubscribe();
+    this.toCCSubscription = this.toCurrencyControl.valueChanges
+      .pipe(withLatestFrom(this.currency$))
+      .subscribe(([value, rate]) => {
+        if (
+          value &&
+          rate &&
+          this.toControl.value &&
+          this.fromCurrencyControl.value
+        ) {
+          const toValue = this.toControl.value;
+          const fromCc = this.fromCurrencyControl.value;
+          const UAH = toValue * (rate.find((item) => item.cc === value)?.rate ?? 0);
+          const result =
+            UAH / (rate.find((item) => item.cc === fromCc)?.rate ?? 0);
+          this.fromIControl.patchValue(result);
+        }
+      });
+  }
+
+  toCCFieldUnsubscribe(): void {
+    if (this.toCCSubscription) {
+      this.toCCSubscription.unsubscribe();
+    }
   }
 }
